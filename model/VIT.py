@@ -20,26 +20,7 @@ class EmbeddingLayer(nn.Module):
         nn.init.normal_(self.cls_token, std=1e-6)
         trunc_normal_(self.pos_embed, std=2e-2)
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.ConvTranspose2d):
-                n = m.kernel_size[1]
-                factor = (n+1) // 2
-                if n % 2 == 1:
-                    center = factor - 1
-                else:
-                    center = factor - 0.5
-                og = np.ogrid[:n, :n]
-                weights_np = (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
-                m.weight.data.copy_(torch.from_numpy(weights_np))
+
 
     def forward(self, x):
         B, C, H, W = x.shape
@@ -74,26 +55,7 @@ class MSA(nn.Module):
         self.proj = nn.Linear(dim, dim)
         self.proj_drop = nn.Dropout(proj_drop)
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.ConvTranspose2d):
-                n = m.kernel_size[1]
-                factor = (n+1) // 2
-                if n % 2 == 1:
-                    center = factor - 1
-                else:
-                    center = factor - 0.5
-                og = np.ogrid[:n, :n]
-                weights_np = (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
-                m.weight.data.copy_(torch.from_numpy(weights_np))
+
 
     def forward(self, x):
         B, N, C = x.shape
@@ -136,26 +98,7 @@ class MLP(nn.Module):
         self.fc2 = nn.Linear(hidden_features, out_features, bias=bias)
         self.drop2 = nn.Dropout(drop)
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.ConvTranspose2d):
-                n = m.kernel_size[1]
-                factor = (n+1) // 2
-                if n % 2 == 1:
-                    center = factor - 1
-                else:
-                    center = factor - 0.5
-                og = np.ogrid[:n, :n]
-                weights_np = (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
-                m.weight.data.copy_(torch.from_numpy(weights_np))
+
 
     def forward(self, x):
         x = self.fc1(x)
@@ -177,26 +120,7 @@ class EncoderBlock(nn.Module):
         self.mlp = MLP(in_features=dim, hidden_features=int(dim * mlp_ratio),
                        act_layer=act_layer, drop=drop)
 
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.ConvTranspose2d):
-                n = m.kernel_size[1]
-                factor = (n+1) // 2
-                if n % 2 == 1:
-                    center = factor - 1
-                else:
-                    center = factor - 0.5
-                og = np.ogrid[:n, :n]
-                weights_np = (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
-                m.weight.data.copy_(torch.from_numpy(weights_np))
+
 
     def forward(self, x):
         x = self.attn(self.norm1(x)) + x
@@ -227,26 +151,7 @@ class ViT(nn.Module):
 
         self.norm = norm_layer(embed_dim)
         self.head = nn.Linear(self.num_features, num_classes) if num_classes > 0 else nn.Identity()
-    def init_weight(self):
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                nn.init.xavier_normal_(m.weight)
-            elif isinstance(m, nn.BatchNorm2d) or isinstance(m, nn.BatchNorm1d):
-                nn.init.constant_(m.weight, 1)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.Linear):
-                nn.init.xavier_normal_(m.weight)
-                nn.init.constant_(m.bias, 0)
-            elif isinstance(m, nn.ConvTranspose2d):
-                n = m.kernel_size[1]
-                factor = (n+1) // 2
-                if n % 2 == 1:
-                    center = factor - 1
-                else:
-                    center = factor - 0.5
-                og = np.ogrid[:n, :n]
-                weights_np = (1 - abs(og[0] - center) / factor) * (1 - abs(og[1] - center) / factor)
-                m.weight.data.copy_(torch.from_numpy(weights_np))
+
 
     def forward(self, x):
         x = self.patch_embed(x)
